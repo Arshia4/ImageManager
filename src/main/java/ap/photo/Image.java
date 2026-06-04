@@ -4,22 +4,23 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.HashSet ;
 
 public class Image{
-    private int imageId ;
-    private int userId ;
+    private String imageId ;
+    private String userId ;
     private String title ;
     private String caption ;
     private LocalDateTime uploadDate;
     private String filePath ;
-    private Set<Integer> likedUserIds;
+    private Set<String> likedUserIds;
     private List<String> tags ;
-    private List<Integer> albumIds ;
+    private List<String> albumIds ;
 
-    public Image(int imageId , int userId , String title , String caption , String filePath){
-        this.imageId=imageId;
-        this.userId=userId ;
+    public Image(String userId ,String title , String caption , String filePath){
+        this.imageId= UUID.randomUUID().toString();
+        this.userId= userId;
         this.title=title ;
         this.caption=caption ;
         this.filePath= filePath ;
@@ -29,10 +30,10 @@ public class Image{
         this.albumIds = new ArrayList<>();
     }
 
-    public int getImageId(){
+    public String getImageId(){
         return imageId ;
     }
-    public int getUserId(){
+    public String getUserId(){
         return userId ;
     }
     public String getTitle(){
@@ -50,7 +51,7 @@ public class Image{
     public List<String> getTags(){
         return tags ;
     }
-    public List<Integer> getAlbumIds(){
+    public List<String> getAlbumIds(){
         return albumIds ;
     }
     public int getLikesCount(){
@@ -64,10 +65,10 @@ public class Image{
         this.caption=caption ;
     }
 
-    public void addLike(int userId){
+    public void addLike(String userId){
         likedUserIds.add(userId);
     }
-    public void removeLike(int userId){
+    public void removeLike(String userId){
         likedUserIds.remove(userId);
     }
 
@@ -80,12 +81,12 @@ public class Image{
         tags.remove(tag) ;
     }
 
-    public void addToAlbum(int albumId){
+    public void addToAlbum(String albumId){
         if(!albumIds.contains(albumId)){
             albumIds.add(albumId) ;
         }        
     }
-    public void removeFromAlbum(int albumId){
+    public void removeFromAlbum(String albumId){
         albumIds.remove(albumId) ;
     } 
 }
