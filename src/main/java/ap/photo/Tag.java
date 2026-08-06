@@ -5,8 +5,8 @@ import java.util.UUID;
 public class Tag{
     private String tagId ;
     private String name ;
-    public Tag (String name){
-        this.tagId= UUID.randomUUID().toString();
+    public Tag (String tagId , String name){
+        this.tagId= tagId ;
         this.name = name ;
     }
     
