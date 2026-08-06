@@ -8,14 +8,14 @@ public class Comment{
     private String userId ;
     private String imageId ;
     private String commentText ;
-    private LocalDateTime sendTime ;
+    private String  sendTime ;
 
-    public Comment(String userId , String imageId , String commentText){
+    public Comment(String commentId ,String userId , String imageId , String commentText, String sendTime){
         this.userId = userId ;
         this.imageId= imageId ;
         this.commentText=commentText;
-        this.commentId = UUID.randomUUID().toString();
-        this.sendTime = LocalDateTime.now();
+        this.commentId = commentId ;
+        this.sendTime = sendTime ;
     }
 
     public String getCommentId(){
@@ -30,7 +30,7 @@ public class Comment{
     public String getCommentText(){
         return commentText ;
     }
-    public LocalDateTime getSendTime(){
+    public String getSendTime(){
         return sendTime ;
     }
 
