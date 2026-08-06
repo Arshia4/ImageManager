@@ -12,22 +12,29 @@ public class Image{
     private String userId ;
     private String title ;
     private String caption ;
-    private LocalDateTime uploadDate;
+    private String filePath;
+    private String uploadDate;
     private Set<String> likedUserIds;
     private List<String> tags ;
     private List<String> albumIds ;
+    private String imageData; 
 
-    public Image(String userId ,String title , String caption){
-        this.imageId= UUID.randomUUID().toString();
+    public Image(String imageId , String userId ,String title , String caption ,String uploadDate , String filePath){
+        this.imageId= imageId ;
         this.userId= userId;
+        this.filePath = filePath ;
         this.title=title ;
         this.caption=caption ;
         this.likedUserIds= new HashSet<>();
-        this.uploadDate = LocalDateTime.now();
+        this.uploadDate = uploadDate ;
         this.tags = new ArrayList<>() ;
         this.albumIds = new ArrayList<>();
+        this.imageData = ""; 
     }
-
+    
+    public String getFilePath() {
+        return filePath;
+    }
     public String getImageId(){
         return imageId ;
     }
@@ -40,7 +47,7 @@ public class Image{
     public String getCaption(){
         return caption;
     }
-    public LocalDateTime getUploadDate(){
+    public String getUploadDate(){
         return uploadDate ;
     }
     public List<String> getTags(){
@@ -51,6 +58,12 @@ public class Image{
     }
     public int getLikesCount(){
         return likedUserIds.size();
+    }
+    public String getImageData() { 
+        return imageData;
+    }
+    public void setImageData(String imageData) {
+        this.imageData = imageData;
     }
 
     public void setTitle(String title){
