@@ -3,7 +3,6 @@ package ap.photo;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class Album {
     private final String albumId;
@@ -12,14 +11,8 @@ public class Album {
     private final LocalDateTime createdTime;
     private List<String> images;
 
-    public Album(String userId, String name) {
-        if (userId == null || userId.trim().isEmpty()) {
-            throw new IllegalArgumentException("User id cannot be empty");
-        }
-        if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("Album name cannot be empty");
-        }
-        this.albumId = UUID.randomUUID().toString();
+    public Album(String albumId, String name , String userId) {
+        this.albumId = albumId ;
         this.userId = userId;
         this.name = name;
         this.createdTime = LocalDateTime.now();
@@ -29,17 +22,21 @@ public class Album {
     public String getAlbumId() {
         return albumId;
     }
+
     public String getUserId() {
         return userId;
     }
+
     public String getName() {
         return name;
     }
+
     public LocalDateTime getCreatedTime() {
         return createdTime;
     }
+
     public List<String> getImages() {
-        return new ArrayList<>(images);
+        return images;
     }
 
     public void setName(String name) {
@@ -50,10 +47,7 @@ public class Album {
     }
 
     public boolean addImage(String imageId) {
-        if (imageId == null || imageId.trim().isEmpty()) {
-            return false;
-        }
-        if (images.contains(imageId)) {
+        if (imageId == null || images.contains(imageId)) {
             return false;
         }
         images.add(imageId);
@@ -74,16 +68,5 @@ public class Album {
 
     public void clearImages() {
         images.clear();
-    }
-
-    @Override
-    public String toString() {
-        return "Album{" +
-                "albumId='" + albumId + '\'' +
-                ", userId='" + userId + '\'' +
-                ", name='" + name + '\'' +
-                ", createdTime=" + createdTime +
-                ", imageCount=" + images.size() +
-                '}';
     }
 }
