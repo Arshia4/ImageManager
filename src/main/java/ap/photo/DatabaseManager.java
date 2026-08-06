@@ -7,11 +7,13 @@ import java.time.LocalDateTime;
 public class DatabaseManager {
     private Database database;
     private FileManager fileManager;
+    
     public DatabaseManager(Database database , FileManager fileManager){
         this.database=database ;
         this.fileManager = fileManager ;
     }
 
+  
     public User registerUser(String username, String password) {
         for (User user : database.getUsers().values()) {
             if (user.getUsername().equals(username)) {
@@ -86,6 +88,12 @@ public class DatabaseManager {
         return database.getImageLikes().getOrDefault(imageId, new ArrayList<>()).size();
     }
 
+   
+    public boolean isImageLikedByUser(String imageId, String userId) {
+        List<String> likes = database.getImageLikes().get(imageId);
+        return likes != null && likes.contains(userId);
+    }
+
     public Comment addComment(String imageId, String userId, String text) {
         if (database.getImages().get(imageId) == null) return null;
         
@@ -126,6 +134,27 @@ public class DatabaseManager {
         }
     }
 
+    
+    public List<String> getImageTagIds(String imageId) {
+        return database.getImageTags().getOrDefault(imageId, new ArrayList<>());
+    }
+
+    
+    public Tag getTagById(String tagId) {
+        return database.getTags().get(tagId);
+    }
+
+   
+    public List<String> getImageAlbumIds(String imageId) {
+        List<String> result = new ArrayList<>();
+        for (Album album : database.getAlbums().values()) {
+            if (album.containsImage(imageId)) {
+                result.add(album.getAlbumId());
+            }
+        }
+        return result;
+    }
+
     public List<Image> searchImages(String query) {
         List<Image> result = new ArrayList<>();
         String lowerQuery = query.toLowerCase();
@@ -147,6 +176,7 @@ public class DatabaseManager {
         database.getImages().remove(imageId);
         database.getImageLikes().remove(imageId);
         database.getImageTags().remove(imageId);
+        
         List<String> commentsToRemove = new ArrayList<>();
         for (Comment comment : database.getComments().values()) {
             if (comment.getImageId().equals(imageId)) {
@@ -160,6 +190,17 @@ public class DatabaseManager {
         return true;
     }
 
+
+    public boolean deleteImages(List<String> imageIds, String userId) {
+        boolean allDeleted = true;
+        for (String imageId : imageIds) {
+            if (!deleteImage(imageId, userId)) {
+                allDeleted = false;
+            }
+        }
+        return allDeleted;
+    }
+
     public Album createAlbum(String userId, String name) {
         if (database.getUsers().get(userId) == null) return null;
         
@@ -170,18 +211,26 @@ public class DatabaseManager {
     }
 
     public void addImageToAlbum(String imageId, String albumId) {
-        List<String> images = database.getAlbumImages().getOrDefault(albumId, new ArrayList<>());
-        if (!images.contains(imageId)) {
-            images.add(imageId);
-            database.getAlbumImages().put(albumId, images);
+        Album album = database.getAlbums().get(albumId);
+        if (album != null) {
+            album.addImage(imageId);
         }
+    }
+
+   
+    public List<String> getAlbumImageIds(String albumId) {
+        Album album = database.getAlbums().get(albumId);
+        if (album != null) {
+            return album.getImages();
+        }
+        return new ArrayList<>();
     }
 
     public List<Image> getAlbumImages(String albumId) {
         List<Image> result = new ArrayList<>();
-        List<String> imageIds = database.getAlbumImages().get(albumId);
-        if (imageIds != null) {
-            for (String imageId : imageIds) {
+        Album album = database.getAlbums().get(albumId);
+        if (album != null) {
+            for (String imageId : album.getImages()) {
                 Image image = database.getImages().get(imageId);
                 if (image != null) {
                     result.add(image);
@@ -199,5 +248,89 @@ public class DatabaseManager {
             }
         }
         return result;
+    }
+
+    
+    public boolean deleteAlbum(String albumId, String userId) {
+        Album album = database.getAlbums().get(albumId);
+        if (album == null || !album.getUserId().equals(userId)) {
+            return false;
+        }
+        database.getAlbums().remove(albumId);
+        return true;
+    }
+
+   
+    public void removeImageFromAlbum(String imageId, String albumId) {
+        Album album = database.getAlbums().get(albumId);
+        if (album != null) {
+            album.removeImage(imageId);
+        }
+    }
+
+    public List<User> getAllUsers() {
+        return new ArrayList<>(database.getUsers().values());
+    }
+
+    public User getUserByUsername(String username) {
+        for (User user : database.getUsers().values()) {
+            if (user.getUsername().equals(username)) {
+                return user;
+            }
+        }
+        return null;
+    } 
+
+    public void banUser(String username) {
+        User user = getUserByUsername(username);
+        if (user != null) {
+            user.setBanned(true);
+        }
+    }
+
+    public void unbanUser(String username) {
+        User user = getUserByUsername(username);
+        if (user != null) {
+            user.setBanned(false);
+        }
+    }
+
+    public Map<String, Integer> getUserStats(String username) {
+        User user = getUserByUsername(username);
+        if (user == null) return null;
+        
+        Map<String, Integer> stats = new HashMap<>();
+        stats.put("imageCount", getUserImages(user.getUserId()).size());
+        stats.put("albumCount", getUserAlbums(user.getUserId()).size());
+        return stats;
+    }
+
+    public void editImageTitle(String imageId, String newTitle) {
+        Image image = database.getImages().get(imageId);
+        if (image != null) {
+            image.setTitle(newTitle);
+        }
+    }
+
+    public void editImageCaption(String imageId, String newCaption) {
+        Image image = database.getImages().get(imageId);
+        if (image != null) {
+            image.setCaption(newCaption);
+        }
+    }
+
+    public void editImageTags(String imageId, List<String> newTags) {
+        database.getImageTags().remove(imageId);
+        
+        for (String tagName : newTags) {
+            addTagToImage(imageId, tagName);
+        }
+    }
+
+    public void editComment(String commentId, String newText) {
+        Comment comment = database.getComments().get(commentId);
+        if (comment != null) {
+            comment.setCommentText(newText);
+        }
     }
 }
